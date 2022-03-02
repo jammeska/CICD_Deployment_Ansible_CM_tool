@@ -1,0 +1,12 @@
+---
+# tasks file for firewall
+- name: allow port 8080 and port 8085 in firewall
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - 8080/tcp
+    - 8085/tcp
+  notify: "Restart firewalld service"
+  

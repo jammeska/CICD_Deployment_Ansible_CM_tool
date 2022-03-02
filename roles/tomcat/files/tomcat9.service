@@ -1,0 +1,14 @@
+[Unit]
+Description=Apache Tomcat 9
+Documentation=http://tomcat.apache.org/tomcat-9.0-doc/
+After=network.target syslog.target
+
+[Service]
+User=tomcat
+Group=tomcat
+Type=oneshot
+ExecStart=/usr/libexec/tomcat9/bin/startup.sh
+ExecStop=/usr/libexec/tomcat9/bin/shutdown.sh
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

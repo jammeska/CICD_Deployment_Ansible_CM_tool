@@ -1,0 +1,72 @@
+---
+# tasks file for tomcat
+- name: unpack latest Tomecat 9 tar file
+  unarchive:
+    src: apache-tomcat-9.0.58.tar.gz
+    dest: "/tmp/"
+#    creates: "/usr/tomcat9"
+
+- name: copy extracted files 
+  copy:
+    src: /tmp/apache-tomcat-9.0.58/
+    dest: "/usr/libexec/tomcat9"
+    remote_src: yes
+  become: yes
+
+- name: add tomcat group
+  group:
+    name: tomcat
+    state: present
+
+- name: add tomcat user
+  user:
+    name: tomcat
+    group: tomcat
+    home: /usr/libexec/tomcat9
+
+- name: change tomcat9 owner
+  file:
+    path: /usr/libexec/tomcat9
+    state: directory
+    owner: tomcat
+    group: tomcat
+    recurse: yes
+
+- name: create tomcat service file
+  copy:
+    src: tomcat9.service
+    dest: /etc/systemd/system/tomcat9.service
+
+- name: reload daemon
+  shell: systemctl daemon-reload
+
+
+- name: restart tomcat9 service
+  service:
+    name: tomcat9.service
+    state: restarted   
+
+- name: copy tomcat user configuration
+  copy:
+    src: tomcat-users.xml
+    dest: /usr/libexec/tomcat9/conf/tomcat-users.xml
+  notify: "Restart tomcat9 service"
+
+- name: copy manger context.xml configuration
+  copy:
+    src: context.xml
+    dest: "/usr/libexec/tomcat9/webapps/manager/META-INF/context.xml"
+  notify: "Restart tomcat9 service"
+  become: yes 
+
+- name: copy manger server.xml configuration
+  copy:
+    src: server.xml
+    dest: /usr/libexec/tomcat9/conf/server.xml
+  notify: "Restart tomcat9 service"
+
+- name: copy tomcat host mangaer context.xml configuration
+  copy:
+    src: context.xml
+    dest: /usr/libexec/tomcat9/webapps/host-manager/META-INF/context.xml
+  notify: "Restart tomcat9 service"

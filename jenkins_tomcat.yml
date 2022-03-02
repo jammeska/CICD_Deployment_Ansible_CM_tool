@@ -1,0 +1,8 @@
+---
+- name: install and configure tomcate
+  hosts: rps_mvn
+  become: yes
+  roles:
+    - maven
+    - tomcat
+

@@ -1,0 +1,9 @@
+---
+- name: install and configure jenkins maven java and tomcat
+  hosts: rps_mvn
+  become: yes
+
+  roles:
+    - java
+    - jenkins
+    - firewall
