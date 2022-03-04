@@ -1,0 +1,29 @@
+pipeline{
+    agent any
+    stages{
+        stage('Pull project repo from github'){
+            steps {
+                git branch: 'main', url: 'https://github.com/jammeska/CICD_Deployment_Ansible_CM_tool.git'
+            }
+        }
+        stage('Run jenkins_tomcat playbook to install and configure tomcat'){
+            steps {
+                ansiblePlaybook credentialsId: '8eb70024-24b2-4850-9569-3ccc5728cc85', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory', playbook: 'jenkins_tomcat.yml'
+            }
+        }
+        stage('Pull rock-paper-scissors from github'){
+            steps {
+                git branch: 'patch-1', url: 'https://github.com/jammeska/rock-paper-scissors.git'
+            }
+        }
+        stage('bulid maven package'){
+            steps {
+                sh "mvn clean install"
+            }
+        stage('deploy to container'){
+            steps {
+                deploy adapters: [tomcat8(credentialsId: '26be973a-b592-4200-b3cf-3af5f5c0a6ab', path: '', url: 'http://192.168.56.50:8085/')], contextPath: 'rps_war', war: '**/*.war'
+            }
+        }
+    }
+}
